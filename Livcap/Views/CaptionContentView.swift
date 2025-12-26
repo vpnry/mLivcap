@@ -14,11 +14,18 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
     @Binding var firstContentAnimationOffset: CGFloat
     @Binding var firstContentAnimationOpacity: Double
     
+    // Scrollbar state
+    @State private var contentHeight: CGFloat = 0
+    @State private var visibleHeight: CGFloat = 0
+    @State private var scrollOffset: CGFloat = 0
+    @State private var isScrolling: Bool = false
+    
     private let opacityLevel: Double = 0.7
     
     var body: some View {
         ScrollViewReader { proxy in
-            ScrollView {
+            ZStack(alignment: .trailing) {
+                ScrollView(showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     // Caption history (older sentences at top)
                     ForEach(captionViewModel.captionHistory.indices, id: \.self) { index in
@@ -59,6 +66,52 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
+                .background(
+                    GeometryReader { geo -> Color in
+                        DispatchQueue.main.async {
+                            self.contentHeight = geo.size.height
+                            self.scrollOffset = geo.frame(in: .named("scroll")).minY
+                        }
+                        return Color.clear
+                    }
+                )
+            }
+            .coordinateSpace(name: "scroll")
+            .background(
+                GeometryReader { geo -> Color in
+                    DispatchQueue.main.async {
+                        self.visibleHeight = geo.size.height
+                    }
+                    return Color.clear
+                }
+            )
+            
+            // Custom Scrollbar
+            if contentHeight > visibleHeight {
+                let thumbHeight = max(20, visibleHeight * (visibleHeight / contentHeight))
+                let scrollRatio = visibleHeight / contentHeight
+                let thumbOffset = -scrollOffset * scrollRatio
+                
+                Capsule()
+                    .fill(Color.primary.opacity(0.6))
+                    .frame(width: 4, height: thumbHeight)
+                    .offset(y: max(0, min(visibleHeight - thumbHeight, thumbOffset)))
+                    .padding(.trailing, 4)
+                    .opacity(isScrolling ? 1 : 0) // Hide when not scrolling if desired, or keep visible
+                    .animation(.easeInOut(duration: 0.2), value: isScrolling)
+                    // Align to top-trailing
+                    .frame(maxHeight: .infinity, alignment: .top)
+            }
+            
+            }
+            .onChange(of: scrollOffset) { _ in
+                // Show scrollbar when scrolling
+                isScrolling = true
+                
+                // Auto hide after delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    isScrolling = false
+                }
             }
             .onChange(of: captionViewModel.currentTranscription) {
                 // Trigger first content animation for currentTranscription
@@ -138,5 +191,21 @@ class MockCaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     .frame(width: 600, height: 400)
     .background(Color.gray.opacity(0.1))
     .preferredColorScheme(.dark)
+}
+
+// MARK: - Scroll Helper
+
+struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGPoint = .zero
+    static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
+        value = nextValue()
+    }
+}
+
+struct ContentSizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
+    }
 }
 
