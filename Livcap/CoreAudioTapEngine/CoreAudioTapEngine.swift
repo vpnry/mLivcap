@@ -18,7 +18,7 @@ final class CoreAudioTapEngine {
     // MARK: Properties
     
     // Logging
-    private let logger = Logger(subsystem: "com.waynexyz.Livcap", category: "CoreAudioTapEngine")
+    private let logger = Logger(subsystem: "org.eu.cuong.mlivecap", category: "CoreAudioTapEngine")
     
     // init
     private var targetProcesses:[AudioObjectID] = []
@@ -44,7 +44,7 @@ final class CoreAudioTapEngine {
     private var bufferAaccumulator:CoreAudioBufferAccumulator?
     
     // setup a queue for the AudioDeviceCreateIOProcIDWithBlock access the tap
-    private let ioProcQueue=DispatchQueue(label: "com.waynexyz.Livcap.ioProcQueue")
+    private let ioProcQueue=DispatchQueue(label: "org.eu.cuong.mlivecap.ioProcQueue")
 
     
     init(forProcesses processIDs:[AudioObjectID]) {

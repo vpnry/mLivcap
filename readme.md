@@ -1,3 +1,12 @@
+This is a fork of [Livcap](https://github.com/wayne-xyz/Livcap).
+
+
+We renamed app id and name to avoid conflict with the original app. And we added support for multiple languages and dictionary lookups on captions.
+
+
+Original Livcap info follows below.
+--------
+
 
 ![Frame 1](https://github.com/user-attachments/assets/2146ec4c-28a3-431e-89f8-7cf505e40066)
 

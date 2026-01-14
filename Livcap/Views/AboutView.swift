@@ -10,10 +10,10 @@ import SwiftUI
 struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
     
-    private let appVersion = "1.1"
+    private let appVersion = "1.2"
     private let privacyPolicyURL = "https://livcap.app/privacy"
     private let termsURL = "https://livcap.app/terms"
-    private let githubURL = "https://github.com/wayne-xyz/Livcap"
+    private let githubURL = "https://github.com/vpnry/mLivcap (A folk of https://github.com/wayne-xyz/Livcap)"
     
     var body: some View {
         VStack(spacing: 20) {
