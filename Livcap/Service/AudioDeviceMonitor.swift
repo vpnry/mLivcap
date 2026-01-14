@@ -105,15 +105,15 @@ final class AudioDeviceMonitor {
 
     private func currentDefaultInputName() -> String? {
         guard let dev = currentDefaultInputID() else { return nil }
-        var name: CFString = "" as CFString
+        var name: Unmanaged<CFString>?
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioObjectPropertyName,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )
-        var dataSize = UInt32(MemoryLayout<CFString?>.size)
+        var dataSize = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
         let status = AudioObjectGetPropertyData(dev, &address, 0, nil, &dataSize, &name)
-        if status == noErr { return name as String }
+        if status == noErr { return name?.takeRetainedValue() as String? }
         return nil
     }
 }

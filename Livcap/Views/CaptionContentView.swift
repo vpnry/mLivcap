@@ -104,7 +104,7 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
             }
             
             }
-            .onChange(of: scrollOffset) { _ in
+            .onChange(of: scrollOffset) {
                 // Show scrollbar when scrolling
                 isScrolling = true
                 
@@ -113,7 +113,7 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                     isScrolling = false
                 }
             }
-            .onChange(of: captionViewModel.currentTranscription) {
+            .onChange(of: captionViewModel.currentTranscription) { _, _ in
                 // Trigger first content animation for currentTranscription
                 if !captionViewModel.currentTranscription.isEmpty && !hasShownFirstContentAnimation && captionViewModel.captionHistory.isEmpty {
                     triggerFirstContentAnimation()
@@ -125,7 +125,7 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                     }
                 }
             }
-            .onChange(of: captionViewModel.captionHistory.count) {
+            .onChange(of: captionViewModel.captionHistory.count) { _, _ in
                 // Trigger first content animation for first caption history entry
                 if !captionViewModel.captionHistory.isEmpty && !hasShownFirstContentAnimation {
                     triggerFirstContentAnimation()

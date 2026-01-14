@@ -150,6 +150,30 @@ struct CaptionView: View {
     @ViewBuilder
     private func controlButtons() -> some View {
         HStack(spacing: 8) {
+            Menu {
+                ForEach(captionViewModel.supportedLanguages, id: \.identifier) { locale in
+                    Button(action: {
+                        captionViewModel.selectLanguage(locale)
+                    }) {
+                        HStack {
+                            Text(locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier)
+                            if captionViewModel.selectedLanguageIdentifier == locale.identifier {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                CircularControlButton(
+                    image: .system("character.bubble.fill"),
+                    helpText: "Select Language",
+                    isActive: true,
+                    action: {} // Menu handles action
+                )
+            }
+            .menuStyle(BorderlessButtonMenuStyle())
+            .frame(width: 32)
+
             CircularControlButton(
                 image: .system(captionViewModel.isMicrophoneEnabled ? "mic.fill" : "mic.slash.fill"),
                 helpText: "Toggle Microphone",

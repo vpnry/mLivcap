@@ -78,11 +78,10 @@ extension AudioObjectID {
         let err = AudioObjectGetPropertyDataSize(self, &address, 0, nil, &dataSize)
         guard err == noErr, dataSize > 0 else { return nil }
         
-        var cfString: CFString = "" as CFString
+        var cfString: Unmanaged<CFString>?
         let err2 = AudioObjectGetPropertyData(self, &address, 0, nil, &dataSize, &cfString)
-        guard err2 == noErr else { return nil }
+        guard err2 == noErr, let result = cfString?.takeRetainedValue() as String? else { return nil }
         
-        let result = cfString as String
         return result.isEmpty ? nil : result
     }
     
@@ -152,7 +151,21 @@ extension AudioObjectID {
     func readString(_ selector: AudioObjectPropertySelector,
                    scope: AudioObjectPropertyScope = kAudioObjectPropertyScopeGlobal,
                    element: AudioObjectPropertyElement = kAudioObjectPropertyElementMain) throws -> String {
-        try read(AudioObjectPropertyAddress(mSelector: selector, mScope: scope, mElement: element), defaultValue: "" as CFString) as String
+        var address = AudioObjectPropertyAddress(mSelector: selector, mScope: scope, mElement: element)
+        var dataSize: UInt32 = 0
+        
+        var err = AudioObjectGetPropertyDataSize(self, &address, 0, nil, &dataSize)
+        guard err == noErr else {
+            throw "Error reading data size for string \(selector): \(err)"
+        }
+        
+        var value: Unmanaged<CFString>?
+        err = AudioObjectGetPropertyData(self, &address, 0, nil, &dataSize, &value)
+        guard err == noErr else {
+            throw "Error reading string for \(selector): \(err)"
+        }
+        
+        return value?.takeRetainedValue() as String? ?? ""
     }
     
     private func read<T>(_ address: AudioObjectPropertyAddress, defaultValue: T) throws -> T {
@@ -183,13 +196,13 @@ extension AudioDeviceID {
     func getDeviceName() -> String {
         var address = AudioObjectPropertyAddress(mSelector: kAudioObjectPropertyElementName, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
         var dataSize: UInt32 = 0
-        var name: CFString = "" as CFString
+        var name: Unmanaged<CFString>?
         
         let err1 = AudioObjectGetPropertyDataSize(self, &address, 0, nil, &dataSize)
         if err1 == noErr {
             let err2 = AudioObjectGetPropertyData(self, &address, 0, nil, &dataSize, &name)
             if err2 == noErr {
-                return name as String
+                return name?.takeRetainedValue() as String? ?? "Unknown Device"
             }
         }
         

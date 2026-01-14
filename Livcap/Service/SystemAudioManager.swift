@@ -166,16 +166,9 @@ class SystemAudioManager: ObservableObject {
     
     private func processEngineOutput(audioStream: AsyncStream<AVAudioPCMBuffer>) {
         Task {
-            do {
-                for await buffer in audioStream {
-                    // Manager-level audio processing
-                    await processAudioBuffer(buffer)
-                }
-            } catch {
-                logger.error("Failed to process engine output: \(error)")
-                await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                }
+            for await buffer in audioStream {
+                // Manager-level audio processing
+                await processAudioBuffer(buffer)
             }
         }
     }

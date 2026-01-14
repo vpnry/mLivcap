@@ -30,16 +30,17 @@ final class SpeechRecognitionManager: ObservableObject {
     @Published var currentTranscription: String = ""
     @Published var captionHistory: [CaptionEntry] = []
     @Published var statusText: String = "Ready to record"
+    @Published var selectedLocale: Locale = Locale.current
     
     // MARK: - Private Properties
     
-    private let speechRecognizer: SFSpeechRecognizer?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     
     // Text processing state
     private var processedTextLength: Int = 0
     private var fullTranscriptionText: String = ""
+    private var currentSpeechRecognizer: SFSpeechRecognizer?
     
     // Frame-based silence detection
     private var consecutiveSilenceFrames: Int = 0
@@ -62,7 +63,6 @@ final class SpeechRecognitionManager: ObservableObject {
     // MARK: - Initialization
     
     init() {
-        self.speechRecognizer = SFSpeechRecognizer(locale: Locale.current)
         setupSpeechRecognition()
     }
     
@@ -119,7 +119,7 @@ final class SpeechRecognitionManager: ObservableObject {
     // MARK: - Public Interface
     
     func startRecording() async throws {
-        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
+        guard let recognizer = SFSpeechRecognizer(locale: selectedLocale), recognizer.isAvailable else {
             let error = SpeechRecognitionError.recognizerNotAvailable
             await updateStatus("Speech recognizer not available")
             speechEventsContinuation?.yield(.error(error))
@@ -140,7 +140,7 @@ final class SpeechRecognitionManager: ObservableObject {
         recognitionTask = nil
         
         // Create initial recognition session
-        try await MainActor.run {
+        await MainActor.run {
             self.startNewSession()
         }
         
@@ -158,7 +158,19 @@ final class SpeechRecognitionManager: ObservableObject {
         // Start session rotation watchdog
         startRotationWatchdog()
         
-        logger.info("✅ SPEECH RECOGNITION ENGINE STARTED")
+        logger.info("✅ SPEECH RECOGNITION ENGINE STARTED with locale: \(self.selectedLocale.identifier)")
+    }
+    
+    func updateLocale(_ locale: Locale) {
+        Task { @MainActor in
+            guard self.selectedLocale != locale else { return }
+            self.selectedLocale = locale
+            self.logger.info("🌐 Locale updated to: \(locale.identifier)")
+            
+            if self.isRecording {
+                self.rotateSession(reason: "locale-change", finalizeCurrent: true)
+            }
+        }
     }
     
     func stopRecording() {
@@ -275,24 +287,26 @@ final class SpeechRecognitionManager: ObservableObject {
     
     @MainActor
     private func startNewSession() {
-        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
-            logger.error("❌ Cannot start session: recognizer unavailable")
+        let recognizer = SFSpeechRecognizer(locale: selectedLocale)
+        guard let speechRecognizer = recognizer, speechRecognizer.isAvailable else {
+            logger.error("❌ Cannot start session: recognizer unavailable for \(self.selectedLocale.identifier)")
             return
         }
+        self.currentSpeechRecognizer = speechRecognizer
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
         recognitionRequest = request
         recognitionTask = speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
             guard let self = self else { return }
-            Task {
+            Task { @MainActor in
                 if let error = error {
-                    await self.updateStatus("Recognition error: \(error.localizedDescription)")
+                    self.updateStatus("Recognition error: \(error.localizedDescription)")
                     self.speechEventsContinuation?.yield(.error(error))
                     return
                 }
                 if let result = result {
                     let transcription = result.bestTranscription.formattedString
-                    await self.processTranscriptionResult(transcription)
+                    self.processTranscriptionResult(transcription)
                 }
             }
         }

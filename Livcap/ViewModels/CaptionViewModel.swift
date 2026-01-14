@@ -26,6 +26,11 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     
     @Published private(set) var isRecording = false
     @Published var statusText: String = "Ready to record"
+    @Published var selectedLanguageIdentifier: String = Locale.current.identifier
+    
+    var supportedLanguages: [Locale] {
+        SFSpeechRecognizer.supportedLocales().sorted { $0.identifier < $1.identifier }
+    }
     
     // Direct boolean flags - simplified approach
     var isMicrophoneEnabled: Bool { audioCoordinator.isMicrophoneEnabled }
@@ -181,5 +186,10 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     func clearCaptions() {
         speechProcessor.clearCaptions()
         logger.info("🗑️ CLEARED ALL CAPTIONS")
+    }
+    
+    func selectLanguage(_ locale: Locale) {
+        selectedLanguageIdentifier = locale.identifier
+        speechProcessor.updateLocale(locale)
     }
 }

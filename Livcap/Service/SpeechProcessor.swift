@@ -42,7 +42,7 @@ final class SpeechProcessor: ObservableObject {
     @MainActor
     private func handleSpeechEvent(_ event: SpeechEvent) {
         switch event {
-        case .transcriptionUpdate(let text):
+        case .transcriptionUpdate(_):
             // Trigger UI update for new transcription
             objectWillChange.send()
             
@@ -82,6 +82,10 @@ final class SpeechProcessor: ObservableObject {
     func processAudioFrame(_ audioFrame: AudioFrameWithVAD) {
         speechRecognitionManager.appendAudioBufferWithVAD(audioFrame)
         handleSpeechStateTransition(audioFrame)
+    }
+
+    func updateLocale(_ locale: Locale) {
+        speechRecognitionManager.updateLocale(locale)
     }
 
     // MARK: - Private Logic
