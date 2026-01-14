@@ -44,6 +44,10 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                                     .fill(Color.clear)
                                     .opacity(opacityLevel)
                             )
+                            .textSelection(.enabled)
+                            .onTapGesture {
+                                captionViewModel.pauseRecording()
+                            }
                             .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
                             .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
                     }
@@ -59,6 +63,10 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                             .padding(.vertical, 1)
                             .lineSpacing(7)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                            .onTapGesture {
+                                captionViewModel.pauseRecording()
+                            }
                             .id("currentTranscription")
                             .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
                             .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
@@ -165,6 +173,8 @@ class MockCaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     ]
     
     @Published var currentTranscription: String = "This is a sample of real-time transcription text as it appears during live captioning"
+    
+    func pauseRecording() {}
 }
 
 

@@ -17,6 +17,7 @@ import os.log
 protocol CaptionViewModelProtocol: ObservableObject {
     var captionHistory: [CaptionEntry] { get }
     var currentTranscription: String { get }
+    func pauseRecording()
 }
 
 /// CaptionViewModel for real-time speech recognition using SFSpeechRecognizer
@@ -162,6 +163,14 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     // Removed: Stream restart handling no longer needed
     
     // MARK: - Helper Functions
+    
+    func pauseRecording() {
+        if isRecording {
+            stopRecording()
+            // Optional: update status text safely via private method or let observer handle it
+            // The existing logic already updates status via audioCoordinator/speechProcessor changes
+        }
+    }
     
     private func updateStatus() {
         if !isRecording {
