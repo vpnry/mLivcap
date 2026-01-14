@@ -75,6 +75,14 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
                 self?.objectWillChange.send()
             }
             .store(in: &cancellables)
+            
+        // Load saved language preference
+        if let savedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguageIdentifier") {
+            self.selectedLanguageIdentifier = savedLanguage
+            // Create a Locale from the identifier to update the processor
+            let locale = Locale(identifier: savedLanguage)
+            speechProcessor.updateLocale(locale)
+        }
     }
     
     // MARK: - Audio Control Methods
@@ -200,5 +208,8 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     func selectLanguage(_ locale: Locale) {
         selectedLanguageIdentifier = locale.identifier
         speechProcessor.updateLocale(locale)
+        
+        // Save preference
+        UserDefaults.standard.set(locale.identifier, forKey: "SelectedLanguageIdentifier")
     }
 }
