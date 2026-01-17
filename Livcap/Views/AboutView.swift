@@ -24,7 +24,7 @@ struct AboutView: View {
             VStack(spacing: 12) {
                 
                 
-                Text("Livcap")
+                Text("mLivcap")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
@@ -55,7 +55,7 @@ struct AboutView: View {
             Spacer()
             
             // Footer
-            Text("© 2025 Livcap. All rights reserved.")
+            Text("© 2026 mLivcap. All rights reserved.")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 20)

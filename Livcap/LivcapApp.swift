@@ -39,7 +39,7 @@ struct LivcapApp: App {
         }
         
         // About window
-        Window("About Livcap", id: "about") {
+        Window("About mLivcap", id: "about") {
             AboutView()
         }
         .windowResizability(.contentSize)

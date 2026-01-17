@@ -50,7 +50,7 @@ struct PermissionWarningBanner: View {
         PermissionWarningBanner(permissionManager: {
             let manager = PermissionManager()
             manager.hasDeniedPermissions = true
-            manager.deniedPermissionMessage = "Microphone and Speech Recognition access denied. Please enable in System Settings > Privacy & Security to use this feature. And restart the Livcap"
+            manager.deniedPermissionMessage = "Microphone and Speech Recognition access denied. Please enable in System Settings > Privacy & Security to use this feature. And restart the mLivcap"
             return manager
         }())
         
@@ -67,7 +67,7 @@ struct PermissionWarningBanner: View {
         PermissionWarningBanner(permissionManager: {
             let manager = PermissionManager()
             manager.hasDeniedPermissions = true
-            manager.deniedPermissionMessage = "Microphone and Speech Recognition access denied. Please enable in System Settings > Privacy & Security to use this feature. And restart the Livcap"
+            manager.deniedPermissionMessage = "Microphone and Speech Recognition access denied. Please enable in System Settings > Privacy & Security to use this feature. And restart the mLivcap"
             return manager
         }())
         
