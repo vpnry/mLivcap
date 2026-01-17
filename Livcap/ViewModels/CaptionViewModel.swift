@@ -95,6 +95,10 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
             let locale = Locale(identifier: savedLanguage)
             speechProcessor.updateLocale(locale)
         }
+        
+        // Load saved translation preference
+        self.isLiveTranslationEnabled = UserDefaults.standard.bool(forKey: "IsLiveTranslationEnabled")
+        self.targetLanguageIdentifier = UserDefaults.standard.string(forKey: "TargetLanguageIdentifier")
     }
     
     // MARK: - Audio Control Methods
@@ -235,8 +239,18 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     
     // MARK: - Translation Support
     
-    @Published var isLiveTranslationEnabled: Bool = false
-    @Published var targetLanguageIdentifier: String?
+    @Published var isLiveTranslationEnabled: Bool = false {
+        didSet {
+            UserDefaults.standard.set(isLiveTranslationEnabled, forKey: "IsLiveTranslationEnabled")
+        }
+    }
+    
+    @Published var targetLanguageIdentifier: String? {
+        didSet {
+            UserDefaults.standard.set(targetLanguageIdentifier, forKey: "TargetLanguageIdentifier")
+        }
+    }
+    
     @Published var currentTranslation: String = ""
     
     // Stream to feed the translation session
