@@ -409,6 +409,24 @@ final class SpeechRecognitionManager: ObservableObject {
             self.logger.info("🗑️ CLEARED ALL CAPTIONS")
         }
     }
+    func  updateLastEntryWithTranslation(_ translation: String) {
+        Task { @MainActor in
+            guard !captionHistory.isEmpty else { return }
+            let lastIndex = captionHistory.count - 1
+            let entry = captionHistory[lastIndex]
+            
+            // Create new entry with translation
+            let newEntry = CaptionEntry(
+                id: entry.id,
+                text: entry.text,
+                translation: translation,
+                confidence: entry.confidence
+            )
+            
+            captionHistory[lastIndex] = newEntry
+            logger.info("📝 Updated last entry with translation")
+        }
+    }
 }
 
 // MARK: - Error Types

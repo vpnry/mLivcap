@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import AppKit
+import Translation
 
 
 struct CaptionView: View {
@@ -66,11 +67,13 @@ struct CaptionView: View {
 
         .onDisappear {
             // Stop all audio sources when window closes
-            if captionViewModel.isMicrophoneEnabled {
-                captionViewModel.toggleMicrophone()
-            }
             if captionViewModel.isSystemAudioEnabled {
                 captionViewModel.toggleSystemAudio()
+            }
+        }
+        .translationTask(translationConfig) { session in
+            if #available(macOS 15.0, *) {
+                await captionViewModel.handleTranslationSession(session)
             }
         }
     }
@@ -174,6 +177,52 @@ struct CaptionView: View {
             .menuStyle(BorderlessButtonMenuStyle())
             .frame(width: 32)
 
+            // Live Translate Button
+            Menu {
+                Button(action: {
+                    captionViewModel.isLiveTranslationEnabled = false
+                    captionViewModel.targetLanguageIdentifier = nil
+                }) {
+                    HStack {
+                        Text("Transcript only")
+                        if !captionViewModel.isLiveTranslationEnabled {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+                
+                Divider()
+                
+                ForEach(captionViewModel.supportedLanguages, id: \.identifier) { locale in
+                    Button(action: {
+                        let sourceId = captionViewModel.selectedLanguageIdentifier
+                        if locale.identifier == sourceId {
+                             captionViewModel.isLiveTranslationEnabled = false
+                             captionViewModel.targetLanguageIdentifier = nil
+                        } else {
+                             captionViewModel.isLiveTranslationEnabled = true
+                             captionViewModel.targetLanguageIdentifier = locale.identifier
+                        }
+                    }) {
+                        HStack {
+                            Text(locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier)
+                            if captionViewModel.isLiveTranslationEnabled && captionViewModel.targetLanguageIdentifier == locale.identifier {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                CircularControlButton(
+                    image: .system("translate"),
+                    helpText: "Live Translate",
+                    isActive: captionViewModel.isLiveTranslationEnabled,
+                    action: {}
+                )
+            }
+            .menuStyle(BorderlessButtonMenuStyle())
+            .frame(width: 32)
+
             CircularControlButton(
                 image: .system(captionViewModel.isMicrophoneEnabled ? "mic.fill" : "mic.slash.fill"),
                 helpText: "Toggle Microphone",
@@ -200,6 +249,17 @@ struct CaptionView: View {
         }
         .opacity(isHovering ? 1.0 : 0.0)
         .animation(.easeInOut(duration: 0.2), value: isHovering)
+    }
+    
+    @available(macOS 15.0, *)
+    private var translationConfig: TranslationSession.Configuration? {
+        guard captionViewModel.isLiveTranslationEnabled,
+              let targetId = captionViewModel.targetLanguageIdentifier else { return nil }
+        
+        let target = Locale.Language(identifier: targetId)
+        let source = Locale.Language(identifier: captionViewModel.selectedLanguageIdentifier)
+        
+        return TranslationSession.Configuration(source: source, target: target)
     }
 }
 

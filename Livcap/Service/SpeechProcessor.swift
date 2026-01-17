@@ -39,8 +39,14 @@ final class SpeechProcessor: ObservableObject {
         }
     }
     
+    // MARK: - Events
+    let speechEventsPublisher = PassthroughSubject<SpeechEvent, Never>()
+
     @MainActor
     private func handleSpeechEvent(_ event: SpeechEvent) {
+        // Publish event for listeners (ViewModel)
+        speechEventsPublisher.send(event)
+        
         switch event {
         case .transcriptionUpdate(_):
             // Trigger UI update for new transcription
@@ -59,6 +65,11 @@ final class SpeechProcessor: ObservableObject {
             logger.error("❌ SPEECH RECOGNITION ERROR: \(error.localizedDescription)")
             // In a real app, you might want to publish this error to the UI
         }
+    }
+    
+    func updateLastEntryWithTranslation(_ translation: String) {
+        speechRecognitionManager.updateLastEntryWithTranslation(translation)
+        objectWillChange.send() // Ensure UI updates
     }
     
     // MARK: - Public Control

@@ -32,44 +32,63 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
                         let entry = captionViewModel.captionHistory[index]
                         let isFirstContent = index == 0 && captionViewModel.currentTranscription.isEmpty
                         
-                        Text(entry.text)
-                            .font(.system(size: 22, weight: .medium, design: .rounded))
-                            .foregroundColor(.primary)
-                            .lineSpacing(7)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 1)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(Color.clear)
-                                    .opacity(opacityLevel)
-                            )
-                            .textSelection(.enabled)
-                            .onTapGesture {
-                                captionViewModel.pauseRecording()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(entry.text)
+                                .font(.system(size: 22, weight: .medium, design: .rounded))
+                                .foregroundColor(.primary)
+                            
+                            if let translation = entry.translation, !translation.isEmpty {
+                                Text(translation)
+                                    .font(.system(size: 20, weight: .regular, design: .rounded))
+                                    .foregroundColor(.secondary)
                             }
-                            .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
-                            .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
+                        }
+                        .lineSpacing(7)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(Color.clear)
+                                .opacity(opacityLevel)
+                        )
+                        .textSelection(.enabled)
+                        .onTapGesture {
+                            captionViewModel.pauseRecording()
+                        }
+                        .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
+                        .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
                     }
                     
                     // Current transcription (real-time at bottom)
-                    if !captionViewModel.currentTranscription.isEmpty {
+                    if !captionViewModel.currentTranscription.isEmpty || !captionViewModel.currentTranslation.isEmpty {
                         let isFirstContent = captionViewModel.captionHistory.isEmpty
+                        let currentTranslation = captionViewModel.currentTranslation
                         
-                        Text(captionViewModel.currentTranscription+"...")
-                            .font(.system(size: 22, weight: .medium, design: .rounded))
-                            .foregroundColor(.primary)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 1)
-                            .lineSpacing(7)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                            .onTapGesture {
-                                captionViewModel.pauseRecording()
+                        VStack(alignment: .leading, spacing: 4) {
+                            if !captionViewModel.currentTranscription.isEmpty {
+                                Text(captionViewModel.currentTranscription+"...")
+                                    .font(.system(size: 22, weight: .medium, design: .rounded))
+                                    .foregroundColor(.primary)
                             }
-                            .id("currentTranscription")
-                            .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
-                            .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
+                            
+                            if !currentTranslation.isEmpty {
+                                Text(currentTranslation+"...")
+                                    .font(.system(size: 20, weight: .regular, design: .rounded))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 1)
+                        .lineSpacing(7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                        .onTapGesture {
+                            captionViewModel.pauseRecording()
+                        }
+                        .id("currentTranscription")
+                        .offset(y: isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOffset : 0)
+                        .opacity(isFirstContent && !hasShownFirstContentAnimation ? firstContentAnimationOpacity : 1.0)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -167,12 +186,14 @@ struct CaptionContentView<ViewModel: CaptionViewModelProtocol>: View {
 
 class MockCaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     @Published var captionHistory: [CaptionEntry] = [
-        CaptionEntry(text: "Welcome to Livcap, the real-time live captioning application for macOS.", confidence: 0.95),
-        CaptionEntry(text: "This app captures audio from your microphone and system audio sources.", confidence: 0.92),
-        CaptionEntry(text: "Speech recognition is powered by Apple's advanced Speech framework.", confidence: 0.88)
+        CaptionEntry(text: "Welcome to Livcap, the real-time live captioning application for macOS.", translation: "Willkommen bei Livcap, der Echtzeit-Live-Untertitelungs-App furch macOS.", confidence: 0.95),
+        CaptionEntry(text: "This app captures audio from your microphone and system audio sources.", translation: "Diese App erfasst Audio von Ihrem Mikrofon und System-Audioquellen.", confidence: 0.92),
+        CaptionEntry(text: "Speech recognition is powered by Apple's advanced Speech framework.", translation: "Die Spracherkennung wird durch Apples fortschrittliches Speech-Framework unterstützt.", confidence: 0.88)
     ]
     
-    @Published var currentTranscription: String = "This is a sample of real-time transcription text as it appears during live captioning"
+    @Published var currentTranscription: String = "This is a sample of real-time transcription text"
+    @Published var currentTranslation: String = "Dies ist ein Beispiel für einen Echtzeit-Transkriptionstext"
+    var isLiveTranslationEnabled: Bool = true
     
     func pauseRecording() {}
 }

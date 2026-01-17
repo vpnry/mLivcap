@@ -11,12 +11,16 @@ import Foundation
 import Combine
 import Speech
 import AVFoundation
+import AVFoundation
 import Accelerate
 import os.log
+import Translation
 
 protocol CaptionViewModelProtocol: ObservableObject {
     var captionHistory: [CaptionEntry] { get }
     var currentTranscription: String { get }
+    var currentTranslation: String { get }
+    var isLiveTranslationEnabled: Bool { get }
     func pauseRecording()
 }
 
@@ -73,6 +77,14 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+            
+        // Subscribe to speech events for translation
+        speechProcessor.speechEventsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                self?.handleSpeechEventForTranslation(event)
             }
             .store(in: &cancellables)
             
@@ -202,14 +214,83 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     
     func clearCaptions() {
         speechProcessor.clearCaptions()
+        currentTranslation = "" // Clear translation too
         logger.info("🗑️ CLEARED ALL CAPTIONS")
     }
     
     func selectLanguage(_ locale: Locale) {
+        // Validation: If selected language == source language, disable translation
+        // But here we are selecting the SOURCE language for recognition
         selectedLanguageIdentifier = locale.identifier
         speechProcessor.updateLocale(locale)
         
         // Save preference
         UserDefaults.standard.set(locale.identifier, forKey: "SelectedLanguageIdentifier")
+        
+        // If translation is enabled, check if we need to disable it (if source == target)
+        if isLiveTranslationEnabled {
+            // Logic handled in View or here? For now, keep simple.
+        }
+    }
+    
+    // MARK: - Translation Support
+    
+    @Published var isLiveTranslationEnabled: Bool = false
+    @Published var targetLanguageIdentifier: String?
+    @Published var currentTranslation: String = ""
+    
+    // Stream to feed the translation session
+    private var translationStreamContinuation: AsyncStream<(String, Bool)>.Continuation?
+    
+    /// Called by CaptionView when a TranslationSession is available
+    @available(macOS 15.0, *)
+    func handleTranslationSession(_ session: TranslationSession) async {
+        logger.info("🟢 LIVE TRANSLATION SESSION STARTED")
+        
+        // Create the stream if needed (or just use a new one for this session)
+        let stream = AsyncStream<(String, Bool)> { continuation in
+            self.translationStreamContinuation = continuation
+        }
+        
+        for await (text, isFinal) in stream {
+            guard !Task.isCancelled else { break }
+            guard !text.isEmpty else {
+                 if isFinal {
+                     currentTranslation = ""
+                 }
+                 continue
+            }
+            
+            do {
+                let response = try await session.translate(text)
+                await MainActor.run {
+                    if isFinal {
+                        // Update the history with the final translation
+                        self.speechProcessor.updateLastEntryWithTranslation(response.targetText)
+                        self.currentTranslation = ""
+                    } else {
+                        // Update live preview
+                        self.currentTranslation = response.targetText
+                    }
+                }
+            } catch {
+                logger.error("⚠️ Translation error: \(error.localizedDescription)")
+            }
+        }
+        
+        
+        logger.info("🔴 LIVE TRANSLATION SESSION ENDED")
+    }
+    
+    private func handleSpeechEventForTranslation(_ event: SpeechEvent) {
+        guard isLiveTranslationEnabled, let continuation = translationStreamContinuation else { return }
+        
+        switch event {
+        case .transcriptionUpdate(let text):
+            continuation.yield((text, false))
+        case .sentenceFinalized(let text):
+            continuation.yield((text, true))
+        default: break
+        }
     }
 }
