@@ -4,5 +4,9 @@
 <dict>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>This app needs access to your system audio to provide real-time speech-to-text captions.</string>
+	<key>CFBundleName</key>
+	<string>mLivcap</string>
+	<key>CFBundleDisplayName</key>
+	<string>mLivcap</string>
 </dict>
 </plist>

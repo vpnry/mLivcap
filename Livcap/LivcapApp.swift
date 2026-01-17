@@ -61,7 +61,7 @@ struct AboutMenuButton: View {
     @Environment(\.openWindow) private var openWindow
     
     var body: some View {
-        Button("About Livcap") {
+        Button("About mLivcap") {
             openWindow(id: "about")
         }
         .keyboardShortcut("a", modifiers: .command)

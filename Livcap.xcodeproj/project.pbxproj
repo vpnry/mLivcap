@@ -24,18 +24,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CC20B3522DEE2BC800DC19E3 /* Livcap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Livcap.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC20B3522DEE2BC800DC19E3 /* mLivcap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mLivcap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20B3622DEE2BC800DC19E3 /* LivcapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LivcapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20B36C2DEE2BC800DC19E3 /* LivcapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LivcapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "Livcap" target */ = {
+		CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "mLivcap" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = CC20B3512DEE2BC800DC19E3 /* Livcap */;
+			target = CC20B3512DEE2BC800DC19E3 /* mLivcap */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -43,7 +43,7 @@
 		CC20B3542DEE2BC800DC19E3 /* Livcap */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "Livcap" target */,
+				CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "mLivcap" target */,
 			);
 			path = Livcap;
 			sourceTree = "<group>";
@@ -99,7 +99,7 @@
 		CC20B3532DEE2BC800DC19E3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CC20B3522DEE2BC800DC19E3 /* Livcap.app */,
+				CC20B3522DEE2BC800DC19E3 /* mLivcap.app */,
 				CC20B3622DEE2BC800DC19E3 /* LivcapTests.xctest */,
 				CC20B36C2DEE2BC800DC19E3 /* LivcapUITests.xctest */,
 			);
@@ -116,9 +116,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CC20B3512DEE2BC800DC19E3 /* Livcap */ = {
+		CC20B3512DEE2BC800DC19E3 /* mLivcap */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CC20B3762DEE2BC800DC19E3 /* Build configuration list for PBXNativeTarget "Livcap" */;
+			buildConfigurationList = CC20B3762DEE2BC800DC19E3 /* Build configuration list for PBXNativeTarget "mLivcap" */;
 			buildPhases = (
 				CC20B34E2DEE2BC800DC19E3 /* Sources */,
 				CC20B34F2DEE2BC800DC19E3 /* Frameworks */,
@@ -131,11 +131,11 @@
 			fileSystemSynchronizedGroups = (
 				CC20B3542DEE2BC800DC19E3 /* Livcap */,
 			);
-			name = Livcap;
+			name = mLivcap;
 			packageProductDependencies = (
 			);
-			productName = Livcap;
-			productReference = CC20B3522DEE2BC800DC19E3 /* Livcap.app */;
+			productName = mLivcap;
+			productReference = CC20B3522DEE2BC800DC19E3 /* mLivcap.app */;
 			productType = "com.apple.product-type.application";
 		};
 		CC20B3612DEE2BC800DC19E3 /* LivcapTests */ = {
@@ -223,7 +223,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CC20B3512DEE2BC800DC19E3 /* Livcap */,
+				CC20B3512DEE2BC800DC19E3 /* mLivcap */,
 				CC20B3612DEE2BC800DC19E3 /* LivcapTests */,
 				CC20B36B2DEE2BC800DC19E3 /* LivcapUITests */,
 			);
@@ -281,12 +281,12 @@
 /* Begin PBXTargetDependency section */
 		CC20B3642DEE2BC800DC19E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CC20B3512DEE2BC800DC19E3 /* Livcap */;
+			target = CC20B3512DEE2BC800DC19E3 /* mLivcap */;
 			targetProxy = CC20B3632DEE2BC800DC19E3 /* PBXContainerItemProxy */;
 		};
 		CC20B36E2DEE2BC800DC19E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CC20B3512DEE2BC800DC19E3 /* Livcap */;
+			target = CC20B3512DEE2BC800DC19E3 /* mLivcap */;
 			targetProxy = CC20B36D2DEE2BC800DC19E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -448,7 +448,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -488,7 +488,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -580,7 +580,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CC20B3762DEE2BC800DC19E3 /* Build configuration list for PBXNativeTarget "Livcap" */ = {
+		CC20B3762DEE2BC800DC19E3 /* Build configuration list for PBXNativeTarget "mLivcap" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CC20B3772DEE2BC800DC19E3 /* Debug */,
