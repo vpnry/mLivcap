@@ -196,6 +196,7 @@ class MockCaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     var isLiveTranslationEnabled: Bool = true
     
     func pauseRecording() {}
+    func copyAllToClipboard() {}
 }
 
 

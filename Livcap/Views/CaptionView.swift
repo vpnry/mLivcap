@@ -238,6 +238,13 @@ struct CaptionView: View {
             )
             
             CircularControlButton(
+                image: .system("doc.on.doc"),
+                helpText: "Copy All Transcriptions",
+                isActive: true,
+                action: { captionViewModel.copyAllToClipboard() }
+            )
+
+            CircularControlButton(
                 image: .system(isPinned ? "pin.fill" : "pin"),
                 helpText: "Pin Window",
                 isActive: isPinned,

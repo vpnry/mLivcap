@@ -15,6 +15,7 @@ import AVFoundation
 import Accelerate
 import os.log
 import Translation
+import AppKit
 
 protocol CaptionViewModelProtocol: ObservableObject {
     var captionHistory: [CaptionEntry] { get }
@@ -22,6 +23,7 @@ protocol CaptionViewModelProtocol: ObservableObject {
     var currentTranslation: String { get }
     var isLiveTranslationEnabled: Bool { get }
     func pauseRecording()
+    func copyAllToClipboard()
 }
 
 /// CaptionViewModel for real-time speech recognition using SFSpeechRecognizer
@@ -220,6 +222,33 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
         speechProcessor.clearCaptions()
         currentTranslation = "" // Clear translation too
         logger.info("🗑️ CLEARED ALL CAPTIONS")
+    }
+    
+    func copyAllToClipboard() {
+        var allText = ""
+        
+        // Add historical captions
+        for entry in captionHistory {
+            allText += entry.text + "\n"
+            if let translation = entry.translation, !translation.isEmpty {
+                allText += translation + "\n"
+            }
+            allText += "\n"
+        }
+        
+        // Add current transcription
+        if !currentTranscription.isEmpty {
+            allText += currentTranscription + "..."
+            if !currentTranslation.isEmpty {
+                allText += "\n" + currentTranslation + "..."
+            }
+        }
+        
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(allText.trimmingCharacters(in: .whitespacesAndNewlines), forType: .string)
+        
+        logger.info("📋 COPIED ALL TRANSCRIPTIONS TO CLIPBOARD")
     }
     
     func selectLanguage(_ locale: Locale) {
