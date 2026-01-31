@@ -29,22 +29,9 @@
 		CC20B36C2DEE2BC800DC19E3 /* LivcapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LivcapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "mLivcap" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = CC20B3512DEE2BC800DC19E3 /* mLivcap */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CC20B3542DEE2BC800DC19E3 /* Livcap */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				CC699FB82DF57B34003A8C03 /* Exceptions for "Livcap" folder in "mLivcap" target */,
-			);
 			path = Livcap;
 			sourceTree = "<group>";
 		};
@@ -446,7 +433,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
 				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -486,7 +473,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
 				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";

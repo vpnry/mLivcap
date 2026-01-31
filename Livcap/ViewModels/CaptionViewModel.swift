@@ -24,6 +24,7 @@ protocol CaptionViewModelProtocol: ObservableObject {
     var isLiveTranslationEnabled: Bool { get }
     func pauseRecording()
     func copyAllToClipboard()
+    func clearCaptions()
 }
 
 /// CaptionViewModel for real-time speech recognition using SFSpeechRecognizer

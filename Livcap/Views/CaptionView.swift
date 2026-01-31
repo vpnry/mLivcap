@@ -245,6 +245,13 @@ struct CaptionView: View {
             )
 
             CircularControlButton(
+                image: .system("trash"),
+                helpText: "Clear All Transcriptions",
+                isActive: true,
+                action: { captionViewModel.clearCaptions() }
+            )
+
+            CircularControlButton(
                 image: .system(isPinned ? "pin.fill" : "pin"),
                 helpText: "Pin Window",
                 isActive: isPinned,

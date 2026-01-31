@@ -197,6 +197,7 @@ class MockCaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     
     func pauseRecording() {}
     func copyAllToClipboard() {}
+    func clearCaptions() {}
 }
 
 
