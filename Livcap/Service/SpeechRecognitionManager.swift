@@ -44,7 +44,7 @@ final class SpeechRecognitionManager: ObservableObject {
     
     // Frame-based silence detection
     private var consecutiveSilenceFrames: Int = 0
-    private let silenceFrameThreshold: Int = 10  // ~2 seconds (20 frames × 100ms)
+    private let silenceFrameThreshold: Int = 8  // ~1.0s (8 frames × 128ms roughly, depends on VAD config, but adjusted down from 10)
     private var currentSpeechState: Bool = false
     
     // AsyncStream for events
@@ -238,8 +238,8 @@ final class SpeechRecognitionManager: ObservableObject {
             if consecutiveSilenceFrames == 1 {
                 onSpeechEnd()
             } else if consecutiveSilenceFrames == silenceFrameThreshold {
-                // 2 seconds of silence - create new line!
-                logger.info("⏰ 2s SILENCE DETECTED - Creating new caption line")
+                // ~1 second of silence - create new line!
+                logger.info("⏰ Silence threshold reached - Creating new caption line")
                 Task {
                     await finalizeSentence()
                 }
@@ -281,6 +281,12 @@ final class SpeechRecognitionManager: ObservableObject {
         if transcription.count > previousFullLength && !currentSpeechState {
             consecutiveSilenceFrames = 0
         }
+
+        // Emergency break for very long sentences without silence
+        if currentTranscription.count > 250 {
+            logger.info("📏 Max sentence length reached - Finalizing")
+            finalizeSentence()
+        }
     }
     
     // MARK: - Session Management (Concise)
@@ -295,6 +301,12 @@ final class SpeechRecognitionManager: ObservableObject {
         self.currentSpeechRecognizer = speechRecognizer
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
+        
+        // Enable auto-punctuation if available (iOS 13+/macOS 10.15+)
+        if #available(macOS 14.0, iOS 13.0, *) {
+            request.addsPunctuation = true
+        }
+        
         recognitionRequest = request
         recognitionTask = speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
             guard let self = self else { return }
@@ -354,8 +366,15 @@ final class SpeechRecognitionManager: ObservableObject {
         // Extract only the part that hasn't been processed yet
         if fullText.count > processedTextLength {
             let startIndex = fullText.index(fullText.startIndex, offsetBy: processedTextLength)
-            let newPart = String(fullText[startIndex...])
-            return newPart.trimmingCharacters(in: .whitespacesAndNewlines)
+            var newPart = String(fullText[startIndex...])
+            
+            // Clean up leading punctuation or spaces that might be artifacts of splicing
+            newPart = newPart.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            // If the first char is a comma or period and we have no current text, it might belong to previous
+            // But usually SFSpeech handles this well.
+            
+            return newPart
         }
         return ""
     }
@@ -363,13 +382,22 @@ final class SpeechRecognitionManager: ObservableObject {
     @MainActor
     private func finalizeSentence() {
         if !currentTranscription.isEmpty {
-            logger.info("📝 FINALIZING SENTENCE: \(self.currentTranscription)")
+            var textToFinalize = currentTranscription.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            // Ensure sentence ends with punctuation
+            let lastChar = textToFinalize.last
+            let punctuationSet: Set<Character> = [".", "?", "!", ",", ";", ":"]
+            if let last = lastChar, !punctuationSet.contains(last) {
+                textToFinalize.append(".")
+            }
+            
+            logger.info("📝 FINALIZING SENTENCE: \(textToFinalize)")
             
             // Add the current sentence part to history
-            addToHistory(currentTranscription)
+            addToHistory(textToFinalize)
             
             // Notify via AsyncStream - this triggers UI to create new line!
-            speechEventsContinuation?.yield(.sentenceFinalized(currentTranscription))
+            speechEventsContinuation?.yield(.sentenceFinalized(textToFinalize))
             
             // Update processed length to include what we just added
             processedTextLength = fullTranscriptionText.count
