@@ -403,10 +403,22 @@ final class SpeechRecognitionManager: ObservableObject {
     
     func clearCaptions() {
         Task { @MainActor in
+            // Treat everything recognized so far as processed so it doesn't resurface
+            let clearedLength = self.fullTranscriptionText.count
+            self.processedTextLength = clearedLength
+            self.fullTranscriptionText = ""
+
             self.captionHistory.removeAll()
             self.currentTranscription = ""
             self.consecutiveSilenceFrames = 0
-            self.logger.info("🗑️ CLEARED ALL CAPTIONS")
+
+            // Restart the recognition session when actively recording to drop
+            // any buffered text from the current SFSpeech task.
+            if self.isRecording {
+                self.rotateSession(reason: "manual-clear", finalizeCurrent: false)
+            }
+
+            self.logger.info("🗑️ CLEARED ALL CAPTIONS (clearedLength=\(clearedLength))")
         }
     }
     func  updateLastEntryWithTranslation(_ translation: String) {

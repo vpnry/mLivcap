@@ -433,7 +433,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
 				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -473,7 +473,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eu.cuong.mlivecap;
 				PRODUCT_NAME = mLivcap;
 				PROVISIONING_PROFILE_SPECIFIER = "";
