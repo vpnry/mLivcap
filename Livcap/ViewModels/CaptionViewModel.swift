@@ -221,7 +221,10 @@ final class CaptionViewModel: ObservableObject, CaptionViewModelProtocol {
     
     func clearCaptions() {
         speechProcessor.clearCaptions()
-        currentTranslation = "" // Clear translation too
+        currentTranslation = "" // Clear live preview translation
+        
+        // Drop any in-flight translation stream so stale translations can't reappear
+        translationStreamContinuation = nil
         logger.info("🗑️ CLEARED ALL CAPTIONS")
     }
     
